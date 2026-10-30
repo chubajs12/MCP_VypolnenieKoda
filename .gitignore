@@ -1,0 +1,9 @@
+﻿# build artifacts / local dumps — не в git
+build/
+*.cfe
+*.epf
+*.log
+.env
+.env.*
+!.env*.example
+__pycache__/
