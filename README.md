@@ -1,6 +1,35 @@
 # MCP_ВыполнениеКода
 
-Расширение-компонент к [MCP_Сервер](https://github.com/vladimir-kharin/1c_mcp): инструменты `execute_query` и `execute_code`. Коробку `MCP_Сервер` это расширение не меняет. Сервер находит обработку-контейнер сам: подсистема `mcpexec_mcp_MCPСервер` → `mcp_КонтейнерыИнструментов` → обработка `mcpexec_ИнструментВыполнениеКода`.
+Расширение-компонент к [MCP_Сервер](https://github.com/vladimir-kharin/1c_mcp): инструменты `execute_query` и `execute_code` для AI-клиентов (Cursor, Claude Desktop и др.) через HTTP-сервис MCP в базе 1С. Коробку `MCP_Сервер` это расширение **не меняет** — только регистрирует свой контейнер инструментов.
+
+Public git: https://github.com/chubajs12/MCP_VypolnenieKoda
+
+## Как это работает
+
+**Model Context Protocol (MCP)** дает модели вызывать «инструменты» на вашем сервере. Коробка `MCP_Сервер` реализует протокол и HTTP-сервис; этот репозиторий добавляет инструменты выполнения кода и запросов в живой базе.
+
+## Компоненты
+
+1. **`src/`** — исходники расширения 1С (Designer XML).
+2. **`build/MCP_ВыполнениеКода_v*.cfe`** — поставка для баз (собирается Full Load → UpdateDB → DumpCfg; в git не коммитится, см. `.gitignore`).
+3. **Обработка `mcpexec_ИнструментВыполнениеКода`** — контейнер для `MCP_Сервер` (`ДобавитьИнструменты`, `ВыполнитьИнструмент`).
+
+## Быстрый старт (база)
+
+1. Установить неизмененный `MCP_Сервер` из [vladimir-kharin/1c_mcp](https://github.com/vladimir-kharin/1c_mcp).
+2. Установить CFE этого репозитория **без безопасного режима** (см. раздел «Установка» ниже).
+3. Опубликовать HTTP-сервис коробки на `127.0.0.1` с Basic-авторизацией.
+4. Проверить инструменты: `execute_code`, `execute_query` (харнес: `scripts/mcp1c/mcp1c.py --list`).
+
+На машине **chubajs12** (линия AI_1C): разработка в worktree `F:\AI_1C\projects\mcp-vypolnenie-koda_dev` (ветка `develop`); канонический clone — `F:\AI_1C\upstream\git\MCP_VypolnenieKoda` (`main`); после merge в `main` — `F:\AI_1C\harness\scripts\mcp\sync-mcp-vypolnenie-koda.ps1` копирует CFE в `harness\tools\mcp1c\`. Документация потока — `harness\docs\16_MCP_VypolnenieKoda.md`.
+
+## Docker
+
+Отдельного Docker-образа у компонента нет: работает внутри сеанса 1С на IIS. Общие MCP в Docker (syntaxcheck, graph, …) — `F:\AI_1C\upstream\mcp\`, см. `harness\docs\12_Docker_общие_MCP.md`.
+
+---
+
+Расширение подключается к коробке так: подсистема `mcpexec_mcp_MCPСервер` → `mcp_КонтейнерыИнструментов` → обработка `mcpexec_ИнструментВыполнениеКода`.
 
 Версия **1.0.1**. Префикс объектов `mcpexec_`. Назначение расширения — дополнение. Режим совместимости расширения — 8.3.20.
 
